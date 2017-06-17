@@ -83,6 +83,7 @@ digit_write: DIGIT_WRITE '(' INT ',' hl ')'{
 		   }
 		   ;
 delay: DELAY '(' expression ')'{
+		top--;
 		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		fprintf(file, "bal delay\n");
 	 }
@@ -94,13 +95,20 @@ hl: HIGH{
 	$$ = 0;
   }
   ;
-stat: ID '=' expression 
+stat: ID '=' expression {
+		top --;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		fprintf(file, "swi $r0, [$sp + %d]\n", table->lookup($1) * 4);
+		printf("%s offset is %d\n", $1, table->lookup($1));
+	}
 	| ID '[' expression_var ']' stat_element_dim '=' expression 
 	| ID '=' function_var 
 	| function_var 
 	| KBREAK  
 	| KCONTINUE 
-	| KRETURN expression 
+	| KRETURN expression {
+		top --;
+	}
 	;
 
 
@@ -162,13 +170,25 @@ lots_of_const_type: lots_of_const_type ',' const_type_init
 				  ;
 const_type_init: ID '=' expression
 			   ;
-type_init: ID '=' expression{
-			table->updateScope(scope);
-			table->install($1, top);
+type_init: ID{
+				table->updateScope(scope);
+				table->install($1, top);
+				printf("%s is install to %d\n", $1, top);
+				printf("%s is install to %d\n", $1, table->lookup($1));
+				top ++;
+			} '=' expression{
+			
+			top --;
+			fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+			fprintf(file, "swi  $r0, [$sp + %d]\n", table->lookup($1) * 4);
+			
 		 }
 	     | ID{
 			table->updateScope(scope);
 			table->install($1, top);
+			printf("%s is install to %d\n", $1, top);
+			printf("%s is install to %d\n", $1, table->lookup($1));
+			top++;
 		 }
 		 | ID '[' INT ']' dim array_init
  	     ;
@@ -202,8 +222,8 @@ expression_var: '(' expression_var ')'
 		  | function_var
 		  ;
 expression: '(' expression ')'
-		  | expression DOUBLE_PLUS
-		  | expression DOUBLE_MINUS
+		  | ID DOUBLE_PLUS{popStack("++");}
+		  | ID DOUBLE_MINUS{popStack("--");}
 		  | expression '+' expression{popStack("+");}
 		  | expression '-' expression{popStack("-");}
 		  | expression '*' expression{popStack("*");}
@@ -219,8 +239,9 @@ expression: '(' expression ')'
 		  |	KTRUE
 		  | UNUM
 		  | ID{
+			printf("%s offset = %d\n", $1, table->lookup($1));
 			fprintf(file, "lwi $r0, [$sp + %d]\n", table->lookup($1) * 4);
-			fprintf(file, "swi, $r0, [$sp + %d]\n", top * 4);
+			fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 			top++;
 		  }
 		  ;
@@ -239,45 +260,52 @@ NUM: INT{
 %%
 void popStack(const char* op){
 	if(!strcmp(op, "+")){
-		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		fprintf(file, "add $r0, $r0, $r1\n");
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;
 	}else if(!strcmp(op, "-")){
-		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		fprintf(file, "sub $r0, $r0, $r1\n");
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;
 	}else if(!strcmp(op, "*")){
-		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		
 		fprintf(file, "mul $r0, $r0, $r1\n");
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;
 	}else if(!strcmp(op, "/")){
-		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
-		fprintf(file, "divsr $r0, r2, $r0, $r1\n");
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		
+		fprintf(file, "divsr $r0, $r2, $r0, $r1\n");
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;
 	}else if(!strcmp(op, "%")){
-		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
-		fprintf(file, "divsr $r0, r2, $r0, $r1\n");
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		
+		fprintf(file, "divsr $r0, $r2, $r0, $r1\n");
 		fprintf(file, "swi $r2, [$sp + %d]\n", top * 4);
 		top++;
+	}else if(!strcmp(op, "++")){
+		
+	}else if(!strcmp(op, "--")){
+	
 	}
 }
 int yyerror(const char* msg){
@@ -294,6 +322,7 @@ int main(void)
 	yyparse();
 	if(function_main_flag == 0){
 		curString[0] = '\0';
+		printf("No main function!!\n");
 		yyerror(" ");
 	}
 	
