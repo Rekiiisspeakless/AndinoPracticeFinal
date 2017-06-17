@@ -14,6 +14,8 @@ SymbolTable* table;
 FILE* file;
 int if_label_count = 0;
 int finish_label_count = 0;
+int and_label_count = 0;
+int or_label_count = 0;
 %}
 %union{
 	int intVal;
@@ -24,7 +26,8 @@ int finish_label_count = 0;
 %token <intVal> INT
 %token DOUBLE
 %token CHAR
-%token DOUBLE_MINUS DOUBLE_PLUS AND OR
+%token DOUBLE_MINUS DOUBLE_PLUS 
+%token <idVal> AND OR
 %token <idVal>COMPARE
 %token STRING
 %token <intVal>HIGH LOW 
@@ -263,9 +266,9 @@ expression: '(' expression ')'
 		  | expression '/' expression{popStack("/");}
 		  | expression '%' expression{popStack("%");}
 		  | expression COMPARE expression{popStack($2);}
-		  | expression AND expression
-		  | expression OR expression
-		  | '!' expression
+		  | expression AND expression{popStack($2);}
+		  | expression OR expression{popStack($2);}
+		  | '!' expression{popStack("!");}
 		  | CHAR
           | STRING
 		  | KFALSE
@@ -410,6 +413,50 @@ void popStack(const char* op){
 		fprintf(file, "xor $r0, $r1, $r0\n");
 		fprintf(file, "movi $r1, 0\n");
 		fprintf(file, "slt $r0, $r1, $r0\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top++;
+	}else if(!strcmp(op, "&&")){
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		fprintf(file, "beqz $r0, .AND%d\n", and_label_count);
+		top --;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		fprintf(file, "beqz $r0, .AND%d\n", and_label_count);
+
+		fprintf(file, "movi $r0, 1\n");
+		fprintf(file, "j .AND%d\n", and_label_count+1);
+		fprintf(file, ".AND%d:\n", and_label_count);
+		and_label_count++;
+		fprintf(file, "movi $r0, 0\n");
+		fprintf(file, ".AND%d:\n", and_label_count);
+		and_label_count++;
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top++;
+
+	}else if(!strcmp(op, "||")){
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		fprintf(file, "beqz $r0, .OR%d\n", or_label_count);
+		top --;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		fprintf(file, "beqz $r0, .OR%d\n", or_label_count+1);
+		fprintf(file, ".OR%d:\n", or_label_count);
+		or_label_count++;
+		fprintf(file, "movi $r0, 1\n");
+		fprintf(file, "j .OR%d\n", or_label_count+1);
+		fprintf(file, ".OR%d:\n", or_label_count);
+		or_label_count++;
+		fprintf(file, "movi $r0, 0\n");
+		fprintf(file, ".OR%d:\n", or_label_count);
+		or_label_count++;
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top++;
+	}else if(!strcmp(op, "!")){
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		fprintf(file, "addi $r0, $r0, 0\n");
+		fprintf(file, "slti $r0, $r0, 1\n");
 		fprintf(file, "zeb $r0, $r0\n");
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;

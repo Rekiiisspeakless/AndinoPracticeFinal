@@ -221,9 +221,11 @@ char	('.'|'\\n'|'\\t')
 					return '=';
 				}
 				if(!strcmp(yytext, "&&")){
+					strcpy(yylval.idVal, yytext);
 					return AND;
 				}
 				if(!strcmp(yytext, "||")){
+					strcpy(yylval.idVal, yytext);
 					return OR;
 				}
 				if(!strcmp(yytext, "!")){
