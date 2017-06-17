@@ -194,21 +194,27 @@ char	('.'|'\\n'|'\\t')
 					return DOUBLE_MINUS;
 				}
 				if(!strcmp(yytext, "<")){
+					strcpy(yylval.idVal, yytext);
 					return COMPARE;
 				}
 				if(!strcmp(yytext, ">")){
+					strcpy(yylval.idVal, yytext);
 					return COMPARE;
 				}
 				if(!strcmp(yytext, "<=")){
+					strcpy(yylval.idVal, yytext);
 					return COMPARE;
 				}
 				if(!strcmp(yytext, ">=")){
+					strcpy(yylval.idVal, yytext);
 					return COMPARE;
 				}
 				if(!strcmp(yytext, "==")){
+					strcpy(yylval.idVal, yytext);
 					return COMPARE;
 				}
 				if(!strcmp(yytext, "!=")){
+					strcpy(yylval.idVal, yytext);
 					return COMPARE;
 				}
 				if(!strcmp(yytext, "=")){

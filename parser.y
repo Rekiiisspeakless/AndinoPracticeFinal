@@ -24,7 +24,8 @@ int finish_label_count = 0;
 %token <intVal> INT
 %token DOUBLE
 %token CHAR
-%token COMPARE DOUBLE_MINUS DOUBLE_PLUS AND OR
+%token DOUBLE_MINUS DOUBLE_PLUS AND OR
+%token <idVal>COMPARE
 %token STRING
 %token <intVal>HIGH LOW 
 %token DIGIT_WRITE
@@ -261,7 +262,7 @@ expression: '(' expression ')'
 		  | expression '*' expression{popStack("*");}
 		  | expression '/' expression{popStack("/");}
 		  | expression '%' expression{popStack("%");}
-		  | expression COMPARE expression
+		  | expression COMPARE expression{popStack($2);}
 		  | expression AND expression
 		  | expression OR expression
 		  | '!' expression
@@ -291,6 +292,7 @@ NUM: INT{
 	   
 %%
 void popStack(const char* op){
+	printf("op = %s!!!!!!!!!!!!!!\n", op);
 	if(!strcmp(op, "+")){
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
@@ -336,8 +338,81 @@ void popStack(const char* op){
 		top++;
 	}else if(!strcmp(op, "++")){
 		
+		
 	}else if(!strcmp(op, "--")){
-	
+		
+
+	}else if(!strcmp(op, ">")){
+		printf("pop!!!!!!!!!!!!\n");
+		top--;
+		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+
+		fprintf(file, "slts $r0, $r1, $r0\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top ++;
+	}else if(!strcmp(op, ">=")){
+		printf("pop!!!!!!!!!!!!\n");
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		top--;
+		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
+
+		fprintf(file, "slts $r0, $r1, $r0\n");
+		fprintf(file, "xori $r0, $r0, 1\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top ++;
+	}else if(!strcmp(op, "<")){
+		printf("pop!!!!!!!!!!!!\n");
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		top--;
+		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
+		
+		fprintf(file, "slts $r0, $r1, $r0\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top ++;
+	}else if(!strcmp(op, "<=")){
+		printf("pop!!!!!!!!!!!!\n");
+		top--;
+		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		
+		fprintf(file, "slts $r0, $r1, $r0\n");
+		fprintf(file, "xori $r0, $r0, 1\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top++;
+	}else if(!strcmp(op, "==")){
+		printf("pop!!!!!!!!!!!!\n");
+		top--;
+		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+		
+		fprintf(file, "xor $r0, $r1, $r0\n");
+		fprintf(file, "slti $r0, $r0, 1\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top++;
+	}else if(!strcmp(op, "!=")){
+		printf("pop!!!!!!!!!!!!\n");
+		top--;
+		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
+		top--;
+		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+
+		fprintf(file, "xor $r0, $r1, $r0\n");
+		fprintf(file, "movi $r1, 0\n");
+		fprintf(file, "slt $r0, $r1, $r0\n");
+		fprintf(file, "zeb $r0, $r0\n");
+		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
+		top++;
 	}
 }
 int yyerror(const char* msg){

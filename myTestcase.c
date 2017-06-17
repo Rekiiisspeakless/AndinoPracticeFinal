@@ -23,12 +23,40 @@ int main() {
 	delay((b + c) * 1000);*/
 	//////////////////if-else
 	int a = 1;
-	if (a) {
-		int a = 3000;
+	if (a == 1) {
+		int a = 6000;
 		digitalWrite(13, HIGH);
 		delay(a);
 	}
-	a = 0;
+	if (a != 0) {
+		int a = 5000;
+		digitalWrite(13, LOW);
+		delay(a);
+	}
+	if (a >= 0) {
+		int a = 4000;
+		digitalWrite(13, HIGH);
+		delay(a);
+	}
+	if (a <= 2) {
+		int a = 3000;
+		digitalWrite(13, LOW);
+		delay(a);
+	}
+
+	if (a > 0) {
+		//
+		int a = 2000;
+		digitalWrite(13, HIGH);
+		delay(a);
+	}
+	if (a < 2) {
+		int a = 1000;
+		digitalWrite(13, LOW);
+		delay(a);
+	}
+	
+	/*a = 0;
 	if (a) {
 		int a = 2000;
 		digitalWrite(13, HIGH);
@@ -39,7 +67,7 @@ int main() {
 		digitalWrite(13, LOW);
 		delay(a);
 	}
-	a = 6;
+	a = 6;*/
 
 	return 0;
 }
