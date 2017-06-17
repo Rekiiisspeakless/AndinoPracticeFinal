@@ -30,20 +30,27 @@ public:
 		}
 	}
 	int lookup(char a[]) {
-		if (cur_count == 0) return -1;
+		if (cur_count == 0) {
+			printf("No id in current scope!\n");
+			return -1;
+		} 
 		for (int i = cur_count - 1; i >= 0; i--) {
-			if (a == table[i].id)
+			if (a == table[i].id && table[i].scope == cur_scope)
 				return i;
 		}
+		printf("No id in current scope!\n");
 		return -1;
 	}
-	void pop() {
-		if (cur_count == 0) return;
+	int pop() {
+		if (cur_count == 0) return 0;
 		int i;
+		int pop_count = 0;
 		for (i = cur_count - 1; i >= 0; i--) {
 			if (table[i].scope != cur_scope) break;
+			pop_count ++;
 		}
 		cur_count = i + 1;
+		return pop_count;
 	}
 	void updateScope(int scope) {
 		cur_scope = scope;

@@ -12,6 +12,8 @@ int top = 0;
 int scope = 0;
 SymbolTable* table;
 FILE* file;
+int if_label_count = 0;
+int finish_label_count = 0;
 %}
 %union{
 	int intVal;
@@ -131,9 +133,39 @@ while_stat: KWHILE '(' expression ')' '{' full_stats '}'
 		  ;
 do_while_stat: KDO '{' full_stats '}' KWHILE '(' expression')' ';'
 			 ;
-if_stat: KIF '(' expression  ')'  '{' full_stats '}'
-	   | KIF '(' expression  ')'  '{' full_stats '}' KELSE '{' full_stats '}' 
+if_stat: if_outer if_inner{
+			fprintf(file, ".ELSE%d:\n", if_label_count);
+			if_label_count++;
+			fprintf(file, ".FIN%d:\n", finish_label_count);
+			finish_label_count++;
+	   }
+	   | if_else_outer if_inner{
+			fprintf(file, ".FIN%d:\n", finish_label_count);
+			finish_label_count++;
+	   } 
        ;
+if_outer: KIF '(' expression  ')' {
+			top --;
+			fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+			fprintf(file, "beqz $r0, .ELSE%d\n", if_label_count);
+			scope++;
+			table->updateScope(scope);
+	    }
+		;
+if_inner: '{' full_stats '}' {
+			fprintf(file, "j .FIN%d\n", finish_label_count);
+			int pop_count = table->pop();
+			top = top - pop_count;
+			scope --;
+			table->updateScope(scope);
+		}
+		; 
+if_else_outer: if_outer  if_inner KELSE{
+				scope ++;
+				fprintf(file, ".ELSE%d:\n", if_label_count);
+				if_label_count++;
+			 }
+			 ;
 for_loop: KFOR '('for_loop_para ';' for_loop_para ';' for_loop_para')''{' full_stats '}'
 		;
 for_loop_para: expression
