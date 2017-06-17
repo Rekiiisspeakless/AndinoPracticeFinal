@@ -1,1 +1,1 @@
-./parser < myTestcase.c
+./codegen < myTestcase.c
