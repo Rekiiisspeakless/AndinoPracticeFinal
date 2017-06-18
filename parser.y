@@ -16,6 +16,7 @@ int if_label_count = 0;
 int finish_label_count = 0;
 int and_label_count = 0;
 int or_label_count = 0;
+int while_label_count = 0;
 %}
 %union{
 	int intVal;
@@ -133,8 +134,29 @@ const: CHAR
      | INT
 	 ;
 
-while_stat: KWHILE '(' expression ')' '{' full_stats '}'
+while_stat: while_outer '{' full_stats '}'{
+			fprintf(file, "j .WHILE%d\n", while_label_count-2);
+			fprintf(file, ".WHILE%d:\n", while_label_count);
+			while_label_count++;
+			int pop_count = table->pop();
+			top = top - pop_count;
+			scope --;
+			table->updateScope(scope);
+		  }
 		  ;
+while_outer:  KWHILE '(' expression ')'{
+				fprintf(file, ".WHILE%d:\n", while_label_count);
+				while_label_count++;
+				top--;
+				fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
+				fprintf(file, "bnez $r0, .WHILE%d\n", while_label_count);
+				fprintf(file, "j .WHILE%d\n", while_label_count + 1);
+				fprintf(file, ".WHILE%d:\n", while_label_count);
+				while_label_count++;
+				scope++;
+				table->updateScope(scope);
+		   }
+		   ;
 do_while_stat: KDO '{' full_stats '}' KWHILE '(' expression')' ';'
 			 ;
 if_stat: if_outer if_inner{
@@ -166,6 +188,7 @@ if_inner: '{' full_stats '}' {
 		; 
 if_else_outer: if_outer  if_inner KELSE{
 				scope ++;
+				table->updateScope(scope);
 				fprintf(file, ".ELSE%d:\n", if_label_count);
 				if_label_count++;
 			 }

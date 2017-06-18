@@ -35,7 +35,7 @@ public:
 			return -1;
 		} 
 		for (int i = cur_count - 1; i >= 0; i--) {
-			if (a == table[i].id && table[i].scope == cur_scope)
+			if (a == table[i].id)
 				return i;
 		}
 		printf("No id in current scope!\n");

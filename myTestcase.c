@@ -70,9 +70,10 @@ int main() {
 	a = 6;*/
 
 	///////////////and-or-not
-	int a = 0;
+	/*int a = 0;
 	int b = 1;
-	int c;
+	int c;*/
+	////////NOT////
 	/*c = !a;
 	digitalWrite(13, HIGH);
 	delay(c * 2000);
@@ -93,7 +94,7 @@ int main() {
 	digitalWrite(13, LOW);
 	delay(1000); */
 
-	c = (a || b) * 2000;
+	/*c = (a || b) * 2000;
 	digitalWrite(13, HIGH);
 	delay(c);
 	c = (!a && b) * 5000;
@@ -104,7 +105,21 @@ int main() {
 	delay(c);
 	c = (a || !b) * 2000;
 	digitalWrite(13, HIGH);
-	delay(c);
+	delay(c);*/
+	
+	///////////WHILE//////
+	int a = 4;
+	while (a > 0) {
+		int b = 0;
+		b = a * 1000;
+		digitalWrite(13, HIGH);
+		delay(b);
+		digitalWrite(13, LOW);
+		delay(1000);
+		a = a - 1;
+	}
+	digitalWrite(13, LOW);
+	delay(a * 1000);
 	return 0;
 }
 
