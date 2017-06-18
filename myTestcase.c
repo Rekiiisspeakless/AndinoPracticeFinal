@@ -108,7 +108,7 @@ int main() {
 	delay(c);*/
 	
 	///////////WHILE//////
-	int a = 4;
+	/*int a = 4;
 	while (a > 0) {
 		int b = 0;
 		b = a * 1000;
@@ -118,8 +118,10 @@ int main() {
 		delay(1000);
 		a = a - 1;
 	}
+	a = 5;
 	digitalWrite(13, LOW);
-	delay(a * 1000);
+	delay(a * 1000);*/
+
 	return 0;
 }
 
