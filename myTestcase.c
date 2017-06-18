@@ -117,11 +117,46 @@ int main() {
 		digitalWrite(13, LOW);
 		delay(1000);
 		a = a - 1;
-	}
-	a = 5;
+	}*/
+	/*a = 5;
 	digitalWrite(13, LOW);
 	delay(a * 1000);*/
+	int a = 0;
+	int b = 4;
+	int c = 3;
+	while (a || b) {
+		// c = 4, 4, 2, 2
+		int c = (a + b) * 1000;
+		digitalWrite(13, HIGH);
+		delay(c);
+		digitalWrite(13, LOW);
+		delay(1000);
+		a = !a;
+		b = b - 1;
+	}
+	a = 1;
+	b = 4;
+	if (c == 3) {
+		int d = (b - a) * 1000;
+		digitalWrite(13, HIGH);
+		delay(d);
+		digitalWrite(13, LOW);
+		c = 1000;
+		delay(c);
+	}
+	else {
 
+	}
+	if (c == 1000) {
+		//d = 2
+		c = c + 1;
+		int d = (c + a) % 1000;
+		digitalWrite(13, HIGH);
+		delay(d * 1000);
+		digitalWrite(13, LOW);
+		delay(c);
+	}
 	return 0;
 }
+
 

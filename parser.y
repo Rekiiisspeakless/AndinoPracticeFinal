@@ -318,7 +318,7 @@ NUM: INT{
 	   
 %%
 void popStack(const char* op){
-	printf("op = %s!!!!!!!!!!!!!!\n", op);
+	
 	if(!strcmp(op, "+")){
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
@@ -369,7 +369,7 @@ void popStack(const char* op){
 		
 
 	}else if(!strcmp(op, ">")){
-		printf("pop!!!!!!!!!!!!\n");
+		
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
@@ -380,7 +380,7 @@ void popStack(const char* op){
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top ++;
 	}else if(!strcmp(op, ">=")){
-		printf("pop!!!!!!!!!!!!\n");
+		
 		top--;
 		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
@@ -392,7 +392,7 @@ void popStack(const char* op){
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top ++;
 	}else if(!strcmp(op, "<")){
-		printf("pop!!!!!!!!!!!!\n");
+		
 		top--;
 		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
 		top--;
@@ -403,7 +403,7 @@ void popStack(const char* op){
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top ++;
 	}else if(!strcmp(op, "<=")){
-		printf("pop!!!!!!!!!!!!\n");
+		
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
@@ -415,7 +415,7 @@ void popStack(const char* op){
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;
 	}else if(!strcmp(op, "==")){
-		printf("pop!!!!!!!!!!!!\n");
+		
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
@@ -427,7 +427,7 @@ void popStack(const char* op){
 		fprintf(file, "swi $r0, [$sp + %d]\n", top * 4);
 		top++;
 	}else if(!strcmp(op, "!=")){
-		printf("pop!!!!!!!!!!!!\n");
+		
 		top--;
 		fprintf(file, "lwi $r1, [$sp + %d]\n", top * 4);
 		top--;
