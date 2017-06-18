@@ -437,10 +437,10 @@ void popStack(const char* op){
 	}else if(!strcmp(op, "||")){
 		top--;
 		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
-		fprintf(file, "beqz $r0, .OR%d\n", or_label_count);
+		fprintf(file, "beqz $r0, .OR%d\n", or_label_count+1);
 		top --;
 		fprintf(file, "lwi $r0, [$sp + %d]\n", top * 4);
-		fprintf(file, "beqz $r0, .OR%d\n", or_label_count+1);
+		fprintf(file, "beqz $r0, .OR%d\n", or_label_count);
 		fprintf(file, ".OR%d:\n", or_label_count);
 		or_label_count++;
 		fprintf(file, "movi $r0, 1\n");

@@ -21,8 +21,8 @@ int main() {
 	digitalWrite(13, LOW);
 	// 5
 	delay((b + c) * 1000);*/
-	//////////////////if-else
-	int a = 1;
+	//////////////////compare
+	/*int a = 1;
 	if (a == 1) {
 		int a = 6000;
 		digitalWrite(13, HIGH);
@@ -54,9 +54,9 @@ int main() {
 		int a = 1000;
 		digitalWrite(13, LOW);
 		delay(a);
-	}
-	
-	/*a = 0;
+	}*/
+	////////////////if-else
+	/*int a = 0;
 	if (a) {
 		int a = 2000;
 		digitalWrite(13, HIGH);
@@ -69,5 +69,42 @@ int main() {
 	}
 	a = 6;*/
 
+	///////////////and-or-not
+	int a = 0;
+	int b = 1;
+	int c;
+	/*c = !a;
+	digitalWrite(13, HIGH);
+	delay(c * 2000);
+	digitalWrite(13, LOW);
+	delay(5000);*/
+
+	/////OR/////
+	/*c = (a || b) * 2000;
+	digitalWrite(13, HIGH);
+	delay(c);
+	digitalWrite(13, LOW);
+	delay(1000);*/
+
+	/////AND//////
+	/*c = (!a && b) * 5000;
+	digitalWrite(13, HIGH);
+	delay(c);
+	digitalWrite(13, LOW);
+	delay(1000); */
+
+	c = (a || b) * 2000;
+	digitalWrite(13, HIGH);
+	delay(c);
+	c = (!a && b) * 5000;
+	digitalWrite(13, LOW);
+	delay(c);
+	c = (a && b) * 5000;
+	digitalWrite(13, LOW);
+	delay(c);
+	c = (a || !b) * 2000;
+	digitalWrite(13, HIGH);
+	delay(c);
 	return 0;
 }
+
